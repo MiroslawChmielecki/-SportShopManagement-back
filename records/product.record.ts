@@ -2,6 +2,7 @@ import {NewProductEntity, ProductCategory, ProductEntity} from '../types'
 import {ValidationError} from "../utils/errors";
 import {pool} from "../utils/dbMySql";
 import {FieldPacket} from "mysql2";
+import {v4 as uuid} from 'uuid';
 
 
 type ProductRecordResults = [ProductRecord[], FieldPacket[]];
@@ -61,10 +62,58 @@ export class ProductRecord implements ProductEntity {
         this.quantity = quantity;
     }
 
+    //getOne
     static async getOne(id: string): Promise<ProductRecord | null> {
         const [results] = await pool.execute("SELECT * FROM `products` WHERE id = :id", {
             id,
         }) as ProductRecordResults;
         return results.length === 0 ? null : new ProductRecord(results[0])
+    }
+
+    static async getAll(): Promise<ProductRecord[] | null> {
+        const [results] = await pool.execute("SELECT * FROM `products`") as ProductRecordResults;
+        return results.map(obj => new ProductRecord(obj));
+    }
+
+    //delete
+    async delete(): Promise<void> {
+        await pool.execute("DELETE FROM `products` WHERE `id` = :id", {
+            id: this.id,
+        })
+    }
+
+    //insert
+    async insert(): Promise<void> {
+        if (!this.id) {
+            this.id = uuid();
+        } else {
+            throw new Error('Juz istnieje produkt o takim id !!')
+        }
+
+        await pool.execute("INSERT INTO `products`(`id`, `name`, `imgPath`, `description`, `price`, `category`, `brand`, `dateAdded`, `quantity`) VALUES(:id, :name, :imgPath, :description, :price, :category, :brand, :dateAdded, :quantity)", this)
+    }
+
+
+    //update
+    async update(): Promise<void> {
+        await pool.execute('UPDATE `products` SET `name` = :name, `imgPath` = :imgPath, `description` = :description, `price` = :price, `category` = :category, `brand` = :brand, `dateAdded` = :dateAdded, `quantity` = :quantity WHERE `id` = :id ', {
+            id: this.id,
+            name: this.name,
+            imgPath: this.imgPath,
+            description: this.description,
+            price: this.price,
+            category: this.category,
+            brand: this.brand,
+            dateAdded: this.dateAdded,
+            quantity: this.quantity,
+        });
+    }
+
+    static async findSearched(name: string): Promise<ProductRecord[]> {
+        const [results] = await pool.execute("SELECT * FROM `products` WHERE `name` LIKE :search", {
+            search: `%${name}%`,
+        }) as ProductRecordResults;
+
+        return results.map(result => new ProductRecord(result));
     }
 }
