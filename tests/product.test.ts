@@ -24,18 +24,6 @@ const defaultObj2 = {
     quantity: 3,
 };
 
-const defaultObj3 = {
-    id: "8421834712384t723r7gr87t198r7t43t197t",
-    name: "kij baseballowy",
-    imgPath: "../../",
-    description: "do podpierania się i nie tylko",
-    price: 56,
-    category: ProductCategory.baseball,
-    brand: "Atlantis",
-    dateAdded: "2018-07-04",
-    quantity: 6,
-};
-
 afterAll(async () => {
     await pool.end();
 })
@@ -84,8 +72,10 @@ test("ProductRecord.insert inserts data to database", async () => {
     const product = new ProductRecord(defaultObj);
    await product.insert();
 
-   expect(product.id).toBeDefined();
-   expect(product.name).toEqual('rękawice')
+   const insertedProduct = await ProductRecord.getOne(product.id);
+
+   expect(insertedProduct).toBeDefined();
+   expect(insertedProduct.name).toEqual('rękawice');
 })
 
 //findSearched
@@ -115,6 +105,7 @@ test("ProductRecord.findSearched with empty searching returns all products ", as
 
     expect(foundProducts).toBeDefined();
     expect(foundProducts[1].id).toEqual('38078320-c79b-461d-8b2f-31db882559b5');
-})
+});
+
 
 

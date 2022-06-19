@@ -4,7 +4,7 @@ import {pool} from "../utils/dbMySql";
 import {FieldPacket} from "mysql2";
 import {v4 as uuid} from 'uuid';
 
-
+//metody statyczne dotyczą ogółu zbioru a nie statyczne, wykonywane na obiekcie dotyczą pojedynczego elementu
 type ProductRecordResults = [ProductRecord[], FieldPacket[]];
 
 export class ProductRecord implements ProductEntity {
@@ -41,6 +41,10 @@ export class ProductRecord implements ProductEntity {
 
         if (!category || category.length < 3 || category.length > 30) {
             throw new ValidationError("Kategoria produktu musi zawierać między 3 a 30 znaków")
+        }
+
+        if (!brand) {
+            throw new ValidationError("Podaj markę produktu");
         }
 
         if (!dateAdded) {

@@ -1,7 +1,8 @@
 import express, {json} from 'express'
 import cors from 'cors';
 import 'express-async-errors';
-import {handleError, ValidationError} from "./utils/errors";
+import {handleError} from "./utils/errors";
+import {productRouter} from "./routes/product.router";
 
 const app = express();
 
@@ -12,10 +13,7 @@ app.use(cors({
 app.use(json());
 
 //routes..
-app.get('/', async (req, res) => {
-    throw new ValidationError('oh noo !!')
-})
-
+app.use('/product', productRouter);
 //middleware obsługujący błędy
 app.use(handleError)
 
