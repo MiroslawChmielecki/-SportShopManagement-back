@@ -1,8 +1,20 @@
+//Products category
 export enum ProductCategory {
-    soccer = 'soccer',
-    basketball = 'basketball',
     badminton = 'badminton',
     baseball = 'baseball',
-    hockey = 'hockey',
-    rugby = 'rugby'
+    basketball = 'koszykówka',
+    hockey = 'hokej',
+    rugby = 'rugby',
+    soccer = 'piłka nożna',
+    tennis = 'tenis'
 }
+
+
+
+
+
+
+
+
+
+

@@ -12,35 +12,36 @@ export class ProductRecord implements ProductEntity {
 
     id: string;
     name: string;
-    imgPath: string;
     description: string;
     price: number;
     category: ProductCategory;
+    productKind: string;
+    image: string;
     brand: string;
     dateAdded: string;
     quantity: number;
 
     constructor(obj: NewProductEntity) {
-        const {id, name, imgPath, description, price, category, brand, dateAdded, quantity} = obj;
+        const {id, name, description, price, category, productKind, image, brand, dateAdded, quantity} = obj;
 
         if (!name || name.length < 3 || name.length > 30) {
-            throw new ValidationError("Nazwa produktu mieć od 3 do 25 znaków.")
-        }
-
-        if (!imgPath || imgPath.length > 150) {
-            throw new ValidationError("Ścieżka do zdjęcia nie może być pusta ani dłuższa niż 150 znaków")
+            throw new ValidationError("Nazwa produktu musi mieć od 3 do 30 znaków.")
         }
 
         if (!description || description.length < 5 || description.length > 3000) {
             throw new ValidationError("Opis produktu mieć od 5 do 2000 znaków.")
-
         }
+
         if (!price || price < 0 || price > 999999) {
-            throw new ValidationError("Cena produktu musi się zawierać między 0 a 999999")
+            throw new ValidationError("Cena produktu musi się zawierać między 0,1 a 999999")
         }
 
         if (!category || category.length < 3 || category.length > 30) {
             throw new ValidationError("Kategoria produktu musi zawierać między 3 a 30 znaków")
+        }
+
+        if (!image) {
+            throw new ValidationError("Dobierz zdjęcie do produktu")
         }
 
         if (!brand) {
@@ -57,17 +58,22 @@ export class ProductRecord implements ProductEntity {
 
         this.id = id;
         this.name = name;
-        this.imgPath = imgPath;
         this.description = description;
         this.price = price;
         this.category = category;
+        this.productKind = productKind;
+        this.image = image;
         this.brand = brand;
         this.dateAdded = dateAdded;
         this.quantity = quantity;
+
     }
 
     //getOne
     static async getOne(id: string): Promise<ProductRecord | null> {
+        if(!id) {
+            throw new ValidationError('Niepoprawne ID produktu')
+        }
         const [results] = await pool.execute("SELECT * FROM `products` WHERE id = :id", {
             id,
         }) as ProductRecordResults;
@@ -91,33 +97,39 @@ export class ProductRecord implements ProductEntity {
         if (!this.id) {
             this.id = uuid();
         } else {
-            throw new Error('Juz istnieje produkt o takim id !!')
+            throw new ValidationError('Juz istnieje produkt o takim id !!')
         }
 
-        await pool.execute("INSERT INTO `products`(`id`, `name`, `imgPath`, `description`, `price`, `category`, `brand`, `dateAdded`, `quantity`) VALUES(:id, :name, :imgPath, :description, :price, :category, :brand, :dateAdded, :quantity)", this)
+        await pool.execute("INSERT INTO `products`(`id`, `name`, `image`, `description`, `price`, `category`, `productKind`, `brand`, `dateAdded`, `quantity`) VALUES(:id, :name, :image, :description, :price, :category, :productKind, :brand, :dateAdded, :quantity)", this)
     }
 
-
-    //update
-    async update(): Promise<void> {
-        await pool.execute('UPDATE `products` SET `name` = :name, `imgPath` = :imgPath, `description` = :description, `price` = :price, `category` = :category, `brand` = :brand, `dateAdded` = :dateAdded, `quantity` = :quantity WHERE `id` = :id ', {
-            id: this.id,
-            name: this.name,
-            imgPath: this.imgPath,
-            description: this.description,
-            price: this.price,
-            category: this.category,
-            brand: this.brand,
-            dateAdded: this.dateAdded,
-            quantity: this.quantity,
-        });
-    }
-
+    //findSearched
     static async findSearched(name: string): Promise<ProductRecord[]> {
         const [results] = await pool.execute("SELECT * FROM `products` WHERE `name` LIKE :search", {
             search: `%${name}%`,
         }) as ProductRecordResults;
 
         return results.map(result => new ProductRecord(result));
+    }
+
+    //update
+    async update(): Promise<void> {
+
+        if(!this.id) {
+            throw new ValidationError('Nie można uaktualnić produktu który nie istnieje')
+        }
+
+        await pool.execute('UPDATE `products` SET `name` = :name, `image` = :image, `description` = :description, `price` = :price, `category` = :category, `productKind` = :productKind, `brand` = :brand, `dateAdded` = :dateAdded, `quantity` = :quantity WHERE `id` = :id', {
+            id: this.id,
+            name: this.name,
+            image: this.image,
+            description: this.description,
+            price: this.price,
+            category: this.category,
+            productKind: this.productKind,
+            brand: this.brand,
+            dateAdded: this.dateAdded,
+            quantity: this.quantity,
+        });
     }
 }

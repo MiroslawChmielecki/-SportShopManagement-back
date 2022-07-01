@@ -6,14 +6,17 @@ export interface NewProductEntity extends Omit<ProductEntity, 'id'> {
 
 export type CreateProductEntity = Omit<ProductEntity, 'id'>
 
+
 export interface ProductEntity {
     id: string;
     name: string;
-    imgPath: string;
     description: string;
     price: number;
     category: ProductCategory;
+    productKind: string;
+    image: string;
     brand: string;
     dateAdded: string;
     quantity: number;
 }
+
