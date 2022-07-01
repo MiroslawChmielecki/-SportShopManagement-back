@@ -14,6 +14,7 @@ app.use(json());
 
 //routes..
 app.use('/product', productRouter);
+
 //middleware obsługujący błędy
 app.use(handleError)
 
