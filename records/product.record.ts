@@ -81,6 +81,7 @@ export class ProductRecord implements ProductEntity {
     }
 
     static async getAll(): Promise<ProductRecord[] | null> {
+
         const [results] = await pool.execute("SELECT * FROM `products`") as ProductRecordResults;
         return results.map(obj => new ProductRecord(obj));
     }
@@ -103,7 +104,7 @@ export class ProductRecord implements ProductEntity {
         await pool.execute("INSERT INTO `products`(`id`, `name`, `image`, `description`, `price`, `category`, `productKind`, `brand`, `dateAdded`, `quantity`) VALUES(:id, :name, :image, :description, :price, :category, :productKind, :brand, :dateAdded, :quantity)", this)
     }
 
-    //findSearched
+    //wyszukaj po nazwie
     static async findSearched(name: string): Promise<ProductRecord[]> {
         const [results] = await pool.execute("SELECT * FROM `products` WHERE `name` LIKE :search", {
             search: `%${name}%`,

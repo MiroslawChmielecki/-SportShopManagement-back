@@ -18,7 +18,7 @@ export const productRouter = Router()
     .get('/', async (req, res) => {
         const allProducts = await ProductRecord.getAll();
 
-        if(!allProducts) {
+        if (!allProducts) {
             throw new NotFoundError()
         }
 
@@ -36,7 +36,7 @@ export const productRouter = Router()
     .get('/:id', async (req, res) => {
         const product = await ProductRecord.getOne(req.params.id ?? '');
 
-        if(!product) {
+        if (!product) {
             throw new NotFoundError()
         }
 
@@ -69,12 +69,14 @@ export const productRouter = Router()
     .put('/:id', async (req, res) => {
         const product = await new ProductRecord(req.body);
 
-        if(!product) {
+        if (!product) {
             throw new ValidationError('Nie możesz zaktualizować produktu który nie istnieje');
         }
         await product.update()
         res.json(product);
     })
+
+
 
 
 

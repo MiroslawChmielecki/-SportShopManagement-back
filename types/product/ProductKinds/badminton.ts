@@ -8,9 +8,9 @@ export enum BadmintonProductKind {
 
 //badminton products
 export enum BadmintonRackets {
-    BadmintonRacket1 = 'rakieta tenisowa 1',
-    BadmintonRacket2 = 'rakieta tenisowa 2',
-    BadmintonRacket3 = 'rakieta tenisowa 3',
+    BadmintonRacket1 = 'rakieta do badmintona 1',
+    BadmintonRacket2 = 'rakieta do badmintona 2',
+    BadmintonRacket3 = 'rakieta do badmintona 3',
 }
 
 export enum BadmintonShuttlecocks {
