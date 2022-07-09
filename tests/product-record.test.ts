@@ -1,5 +1,5 @@
 import {pool} from "../utils/dbMySql";
-import {ProductRecord} from "../records/product.record";
+import {ProductRecord} from "../records/admin/product.record";
 import {ProductCategory} from "../types";
 
 const defaultObj = {

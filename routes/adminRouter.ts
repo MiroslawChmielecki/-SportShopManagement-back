@@ -1,7 +1,8 @@
 import {Router} from "express";
-import {ProductRecord} from "../records/product.record";
-import {CreateProductEntity} from "../types";
+import {ProductRecord} from "../records/admin/product.record";
+import {AdminLoginEntity, CreateProductEntity} from "../types";
 import {NotFoundError, ValidationError} from "../utils/errors";
+import {AdminLoginRecord} from "../records/admin/adminLogin.record";
 
 /*    * - POST/kolekcja/  - tworzenie nowego elementu (np. wstaw lisa)
 * - GET/kolekcja/  - pobranie wszystkich elementów (np. pobranie wszystkich lisów)
@@ -11,11 +12,20 @@ import {NotFoundError, ValidationError} from "../utils/errors";
 *  - PATCH/kolekcja/1 - modyfikacja pojedynczego elementu przez uzupełnienie (np. zmienianie pewnych parametrów konkretnego obiektu) */
 
 
-export const productRouter = Router()
+export const adminRouter = Router()
 
+    //logowanie do panelu administratora
+    .post('/login', async (req, res) => {
+        const login = new AdminLoginRecord(req.body as AdminLoginEntity).adminName;
+        const password = new AdminLoginRecord(req.body as AdminLoginEntity).adminPassword;
+
+        const admin = await AdminLoginRecord.getAdmin(login, password);
+
+        res.json(admin)
+    })
 
     //pobieranie wszystkich produktów
-    .get('/', async (req, res) => {
+    .get('/product', async (req, res) => {
         const allProducts = await ProductRecord.getAll();
 
         if (!allProducts) {
@@ -26,14 +36,14 @@ export const productRouter = Router()
     })
 
     //pobieranie szukanych produktów
-    .get('/search/:name?', async (req, res) => {
+    .get('/product/search/:name?', async (req, res) => {
         const productsSearched = await ProductRecord.findSearched(req.params.name ?? '')
 
         res.json(productsSearched);
     })
 
     //pobieranie pojedynczego produktu
-    .get('/:id', async (req, res) => {
+    .get('/product/:id', async (req, res) => {
         const product = await ProductRecord.getOne(req.params.id ?? '');
 
         if (!product) {
@@ -44,7 +54,7 @@ export const productRouter = Router()
     })
 
     //dodanie produktu
-    .post('/', async (req, res) => {
+    .post('/product', async (req, res) => {
         const newProduct = new ProductRecord(req.body as CreateProductEntity)
         await newProduct.insert();
 
@@ -54,7 +64,7 @@ export const productRouter = Router()
     })
 
     //usuwanie produktu
-    .delete('/:id', async (req, res) => {
+    .delete('/product/:id', async (req, res) => {
         const product = await ProductRecord.getOne(req.params.id);
 
         if (!product) {
@@ -66,7 +76,7 @@ export const productRouter = Router()
     })
 
     //aktualizacja produktu
-    .put('/:id', async (req, res) => {
+    .put('/product/:id', async (req, res) => {
         const product = await new ProductRecord(req.body);
 
         if (!product) {

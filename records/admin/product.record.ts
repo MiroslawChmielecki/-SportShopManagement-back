@@ -1,6 +1,6 @@
-import {NewProductEntity, ProductCategory, ProductEntity} from '../types'
-import {ValidationError} from "../utils/errors";
-import {pool} from "../utils/dbMySql";
+import {NewProductEntity, ProductCategory, ProductEntity} from '../../types'
+import {NotFoundError, ValidationError} from "../../utils/errors";
+import {pool} from "../../utils/dbMySql";
 import {FieldPacket} from "mysql2";
 import {v4 as uuid} from 'uuid';
 
@@ -66,13 +66,12 @@ export class ProductRecord implements ProductEntity {
         this.brand = brand;
         this.dateAdded = dateAdded;
         this.quantity = quantity;
-
     }
 
     //getOne
     static async getOne(id: string): Promise<ProductRecord | null> {
         if(!id) {
-            throw new ValidationError('Niepoprawne ID produktu')
+            throw new NotFoundError()
         }
         const [results] = await pool.execute("SELECT * FROM `products` WHERE id = :id", {
             id,

@@ -1,12 +1,12 @@
-import {AdminLoginEntity} from "../types";
+import {AdminLoginEntity} from "../../types";
 import {FieldPacket} from "mysql2";
-import {pool} from "../utils/dbMySql";
-import {ValidationError} from "../utils/errors";
+import {pool} from "../../utils/dbMySql";
+import {ValidationError} from "../../utils/errors";
 import bcrypt from 'bcrypt';
 
-type LoginAdminRecordResults = [LoginRecord[], FieldPacket[]];
+type LoginAdminRecordResults = [AdminLoginRecord[], FieldPacket[]];
 
-export class LoginRecord {
+export class AdminLoginRecord {
     adminName: string;
     adminPassword: string;
 
