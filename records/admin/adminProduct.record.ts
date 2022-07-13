@@ -1,13 +1,13 @@
-import {NewProductEntity, ProductCategory, ProductEntity} from '../../types'
+import {ProductCategory, ProductEntity} from '../../types'
 import {NotFoundError, ValidationError} from "../../utils/errors";
 import {pool} from "../../utils/dbMySql";
 import {FieldPacket} from "mysql2";
 import {v4 as uuid} from 'uuid';
 
 //metody statyczne dotyczą ogółu zbioru a nie statyczne, wykonywane na obiekcie dotyczą pojedynczego elementu
-type ProductRecordResults = [ProductRecord[], FieldPacket[]];
+type ProductRecordResults = [AdminProductRecord[], FieldPacket[]];
 
-export class ProductRecord implements ProductEntity {
+export class AdminProductRecord implements ProductEntity {
     //domyślnie jest public
 
     id: string;
@@ -21,7 +21,7 @@ export class ProductRecord implements ProductEntity {
     dateAdded: string;
     quantity: number;
 
-    constructor(obj: NewProductEntity) {
+    constructor(obj: ProductEntity) {
         const {id, name, description, price, category, productKind, image, brand, dateAdded, quantity} = obj;
 
         if (!name || name.length < 3 || name.length > 30) {
@@ -68,53 +68,45 @@ export class ProductRecord implements ProductEntity {
         this.quantity = quantity;
     }
 
-    //getOne
-    static async getOne(id: string): Promise<ProductRecord | null> {
+    static async getOne(id: string): Promise<AdminProductRecord | null> {
         if(!id) {
             throw new NotFoundError()
         }
         const [results] = await pool.execute("SELECT * FROM `products` WHERE id = :id", {
             id,
         }) as ProductRecordResults;
-        return results.length === 0 ? null : new ProductRecord(results[0])
+        return results.length === 0 ? null : new AdminProductRecord(results[0])
     }
 
-    static async getAll(): Promise<ProductRecord[] | null> {
-
+    static async getAll(): Promise<AdminProductRecord[] | null> {
         const [results] = await pool.execute("SELECT * FROM `products`") as ProductRecordResults;
-        return results.map(obj => new ProductRecord(obj));
+        return results.map(obj => new AdminProductRecord(obj));
     }
 
-    //delete
     async delete(): Promise<void> {
         await pool.execute("DELETE FROM `products` WHERE `id` = :id", {
             id: this.id,
         })
     }
 
-    //insert
     async insert(): Promise<void> {
         if (!this.id) {
             this.id = uuid();
         } else {
             throw new ValidationError('Juz istnieje produkt o takim id !!')
         }
-
         await pool.execute("INSERT INTO `products`(`id`, `name`, `image`, `description`, `price`, `category`, `productKind`, `brand`, `dateAdded`, `quantity`) VALUES(:id, :name, :image, :description, :price, :category, :productKind, :brand, :dateAdded, :quantity)", this)
     }
 
-    //wyszukaj po nazwie
-    static async findSearched(name: string): Promise<ProductRecord[]> {
+    static async findSearched(name: string): Promise<AdminProductRecord[]> {
         const [results] = await pool.execute("SELECT * FROM `products` WHERE `name` LIKE :search", {
             search: `%${name}%`,
         }) as ProductRecordResults;
 
-        return results.map(result => new ProductRecord(result));
+        return results.map(result => new AdminProductRecord(result));
     }
 
-    //update
     async update(): Promise<void> {
-
         if(!this.id) {
             throw new ValidationError('Nie można uaktualnić produktu który nie istnieje')
         }

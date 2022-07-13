@@ -2,6 +2,8 @@ import {Router} from "express";
 import {UserRegisterRecord} from "../records/shop/userRegister.record";
 import {UserLoginEntity, UserRegisterEntity} from "../types";
 import {UserLoginRecord} from "../records/shop/userLogin.record";
+import {NotFoundError} from "../utils/errors";
+import {ProductsShopRecord} from "../records/shop/productsShop.record";
 
 export const ShopRouter = Router()
 
@@ -21,5 +23,15 @@ export const ShopRouter = Router()
         const userName = await UserLoginRecord.getUser(login, password);
 
         res.json(userName);
+    })
+
+    .get('/product', async (req, res) => {
+        const allProducts = await ProductsShopRecord.getAll();
+
+        if (!allProducts) {
+            throw new NotFoundError()
+        }
+
+        res.json(allProducts)
     })
 
