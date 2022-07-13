@@ -139,3 +139,5 @@ dist
 # Optional stylelint cache
 
 # SvelteKit build / generate output
+
+config/config.ts
